@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { redirect, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
     Container,
     Typography,
@@ -7,7 +7,6 @@ import {
     CardContent,
     CardMedia,
     Grid,
-    Box,
     CircularProgress,
     Button,
 } from "@mui/material";
