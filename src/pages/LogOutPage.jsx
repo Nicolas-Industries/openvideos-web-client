@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useCookies } from "react-cookie";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
+
+import {
+    Box,
+    Typography,
+    Button,
+    CircularProgress
+} from "@mui/material";
+
 import { useNavigate } from "react-router-dom";
 
 function LogOutPage({ onLogout }) {
@@ -48,7 +52,13 @@ function LogOutPage({ onLogout }) {
         }
     };
 
+
+    const checkedYet = useRef(false);
     useEffect(() => {
+        if (checkedYet.current) {
+            return;
+        }
+        checkedYet.current = true;
         if (!token) {
             onLogout();
             navigate("/");

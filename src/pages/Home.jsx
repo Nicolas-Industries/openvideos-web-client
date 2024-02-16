@@ -3,61 +3,75 @@ import {
     Container,
     Typography,
     Grid,
-    Button,
     CircularProgress,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import VideoCard from "../components/VideoCard";
 
 export default function Home() {
     const [videos, setVideos] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState(1);
     const [maxPage, setMaxPage] = useState(1);
     const [firstTimeFetch, setFirstTimeFetch] = useState(true);
-    const [fetching, setFetching] = useState(false);
     const targetRef = useRef(null);
+    const fetchingRef = useRef(false);
+    const pageRef = useRef(1);
 
     const fetchVideos = (pageNumber) => {
-        if (fetching || page > maxPage) {
+        if (loading) {
+            return;
+        }
+
+        if (fetchingRef.current || pageNumber > maxPage) {
             return;
         }
 
         // Set the page variable first
-        setPage(pageNumber);
-        setFetching(true);
+        pageRef.current = pageNumber;
+        fetchingRef.current = true;
+
+        setLoading(true);
 
         // Fetch the videos
         fetch(
-            `https://api-openvideos.nicolastech.xyz/v1/recommendations/get?page=${pageNumber}`
+            `https://api-openvideos.nicolastech.xyz/v1/recommendations/get?page=${pageNumber}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                mode: "cors",
+            }
         )
             .then((response) => response.json())
             .then((data) => {
+                setError(null);
+                setLoading(false);
                 if (data.maxPage) {
                     setMaxPage(data.maxPage);
                 }
                 setVideos((prevVideos) => [...prevVideos, ...data.data]);
-                setFetching(false);
+                fetchingRef.current = false;
             })
             .catch((error) => {
                 console.error(error);
                 setError(error);
                 setLoading(false);
-                setFetching(false);
+                fetchingRef.current = false;
             });
     };
 
     const handleRetry = () => {
-        setError(null);
-        fetchVideos(page);
+        fetchVideos(pageRef.current);
     };
 
     useEffect(() => {
         if (firstTimeFetch) {
-            fetchVideos(page);
+            fetchVideos(pageRef.current);
             setFirstTimeFetch(false);
         }
-    }, [firstTimeFetch, page]);
+    }, [firstTimeFetch]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -74,16 +88,16 @@ export default function Home() {
                 html.scrollHeight,
                 html.offsetHeight
             );
-            const windowBottom = windowHeight + window.pageYOffset;
+            const windowBottom = windowHeight + window.scrollY;
 
             if (windowBottom >= docHeight - 100) {
-                fetchVideos(page + 1);
+                fetchVideos(pageRef.current + 1);
             }
         };
 
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
-    }, [page]);
+    }, []);
 
     return (
         <Container>
@@ -97,7 +111,7 @@ export default function Home() {
                     </Grid>
                 ))}
             </Grid>
-            {loading && (
+            {loading && !error && (
                 <Container
                     sx={{
                         display: "flex",
@@ -124,9 +138,9 @@ export default function Home() {
                     >
                         Error: {error.message}
                     </Typography>
-                    <Button variant="contained" onClick={handleRetry}>
+                    <LoadingButton variant="contained" onClick={handleRetry} loading={loading}>
                         Retry
-                    </Button>
+                    </LoadingButton>
                 </Container>
             )}
             <Container

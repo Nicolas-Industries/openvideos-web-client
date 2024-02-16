@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from "react";
-import {
-    Routes,
-    Route,
-    BrowserRouter as Router,
-    Link,
-    Navigate,
-    useNavigate,
-} from "react-router-dom";
+import React, { useEffect } from "react";
+import { Routes, Route, BrowserRouter as Router, Link } from "react-router-dom";
+
+import { useCookies } from "react-cookie"; // Import the useCookies hook
+
 import {
     AppBar,
     Toolbar,
@@ -20,21 +16,24 @@ import {
     ListItemButton,
     IconButton,
 } from "@mui/material";
+
 import {
     Home as HomeIcon,
     VideoLibrary as VideoLibraryIcon,
     MenuRounded as MenuIcon,
     CloudUploadRounded,
 } from "@mui/icons-material";
+
 import platformLogo from "./assets/img/logo.svg";
+
 import "./App.css";
+
 import Home from "./pages/Home";
 import Videos from "./pages/Videos";
 import NotFound from "./pages/NotFound";
 import ViewVideo from "./pages/VideoPage";
 import Login from "./pages/LoginPage";
 import Signup from "./pages/SignUpPage";
-import { useCookies } from "react-cookie"; // Import the useCookies hook
 import LogOutPage from "./pages/LogOutPage";
 import StudioVideos from "./pages/studio/Videos";
 import StudioVideoEdit from "./pages/studio/Video";
@@ -45,42 +44,38 @@ function App() {
     const [isLoggedIn, setIsLoggedIn] = React.useState(null);
     const [cookies] = useCookies(["token"]);
 
-    useEffect(() => {
-        async function checkSignInStatus() {
-            if (!cookies.token) {
-                setIsLoggedIn(false);
-            } else {
-                try {
-                    const response = await fetch(
-                        "https://api-openvideos.nicolastech.xyz/v1/auth/tokenValidation",
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Access-Control-Allow-Origin": "*",
-                                "Access-Control-Allow-Methods":
-                                    "GET, POST, PUT, DELETE, OPTIONS",
-                                "Access-Control-Allow-Headers": "*",
-                            },
-                            body: JSON.stringify({ token: cookies.token }),
-                        }
-                    );
-
-                    if (response.status === 200) {
-                        setIsLoggedIn(true);
-                    } else if (response.status === 401) {
-                        setIsLoggedIn(false);
-                    } else {
-                        console.error("Unexpected response status");
-                        setIsLoggedIn(false);
+    async function checkSignInStatus() {
+        if (!cookies.token) {
+            setIsLoggedIn(false);
+        } else {
+            try {
+                const response = await fetch(
+                    "https://api-openvideos.nicolastech.xyz/v1/auth/tokenValidation",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ token: cookies.token }),
                     }
-                } catch (error) {
-                    console.error("Error checking token validity:", error);
+                );
+
+                if (response.status === 200) {
+                    setIsLoggedIn(true);
+                } else if (response.status === 401) {
+                    setIsLoggedIn(false);
+                } else {
+                    console.error("Unexpected response status");
                     setIsLoggedIn(false);
                 }
+            } catch (error) {
+                console.error("Error checking token validity:", error);
+                setIsLoggedIn(false);
             }
         }
+    }
 
+    useEffect(() => {
         checkSignInStatus();
     }, [cookies.token]);
 
@@ -154,30 +149,17 @@ function App() {
                             </Button>
                         </>
                     ) : (
-                        <>
-                            <Button
-                                variant="contained"
-                                color="success"
-                                component={Link}
-                                to="/login"
-                                sx={{
-                                    marginLeft: "auto",
-                                }}
-                            >
-                                Login
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="success"
-                                component={Link}
-                                to="/signup"
-                                sx={{
-                                    marginLeft: 2,
-                                }}
-                            >
-                                Sign Up
-                            </Button>
-                        </>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            component={Link}
+                            to="/login"
+                            sx={{
+                                marginLeft: "auto",
+                            }}
+                        >
+                            Login
+                        </Button>
                     )}
                 </Toolbar>
             </AppBar>
@@ -232,7 +214,10 @@ function App() {
                         path="/login"
                         element={<Login onLogin={handleLogin} />}
                     />
-                    <Route path="/signup" element={<Signup />} />
+                    <Route
+                        path="/signup"
+                        element={<Signup onLogin={handleLogin} />}
+                    />
                     <Route
                         path="/logout"
                         element={<LogOutPage onLogout={handleLogout} />}

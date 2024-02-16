@@ -1,26 +1,32 @@
 import React, { useState } from "react";
+import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
-import {
-    Container,
-    Typography,
-    TextField,
-    Button,
-    Snackbar,
-} from "@mui/material";
+import { Container, Typography, TextField, Snackbar } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
-export default function Signup() {
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+
+export default function Signup({ onLogin }) {
     const navigate = useNavigate();
+    const [cookies, setCookie] = useCookies(["token"]);
     const [reqError, setReqError] = useState(null);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    if (cookies.token) {
+        navigate("/");
+    }
 
     const handleSnackbarClose = () => {
         setOpenSnackbar(false);
     };
 
     const signup = () => {
+        if (isLoading === true) return;
+
         if (password !== confirmPassword) {
             setReqError("Passwords do not match");
             setOpenSnackbar(true);
@@ -28,6 +34,7 @@ export default function Signup() {
         }
 
         if (username && password) {
+            setIsLoading(true);
             fetch("https://api-openvideos.nicolastech.xyz/v1/auth/signup", {
                 method: "POST",
                 headers: {
@@ -41,22 +48,18 @@ export default function Signup() {
             })
                 .then((response) => response.json())
                 .then((data) => {
-                    if (data.status === 200) {
-                        navigate("/login");
-                    } else {
-                        console.error(
-                            "Request failed with status: " +
-                                data.status +
-                                " " +
-                                data.message
-                        );
-                        setReqError(data.message);
-                        setOpenSnackbar(true);
-                    }
+                    setIsLoading(false);
+                    setCookie("token", data.token, {
+                        path: "/",
+                        maxAge: 60 * 60 * 24 * 365 * 2, // 2 years
+                    });
+                    onLogin(); // Call onLogin when the user logs in
+                    navigate("/");
                 })
                 .catch((error) => {
+                    setIsLoading(false);
                     console.error("Request failed with error: " + error);
-                    setReqError("An error occurred.");
+                    setReqError(error.message);
                     setOpenSnackbar(true);
                 });
         }
@@ -79,19 +82,16 @@ export default function Signup() {
                 message={reqError}
             />
             <div
-                sx={{
+                style={{
                     boxShadow: 4,
                     p: 4,
                     bgcolor: "background.paper",
                     borderRadius: 1,
                     width: "100%",
-                    maxWidth: "xs",
+                    maxWidth: "500px",
                 }}
             >
-                <Typography
-                    variant="h4"
-                    sx={{ textAlign: "center", mb: 4 }}
-                >
+                <Typography variant="h4" sx={{ textAlign: "center", mb: 4 }}>
                     Sign Up
                 </Typography>
                 <TextField
@@ -120,15 +120,24 @@ export default function Signup() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                 />
-                <Button
+                <div>
+                    <HCaptcha
+                        sitekey="10000000-ffff-ffff-ffff-000000000001"
+                        onVerify={(token, ekey) =>
+                            handleVerificationSuccess(token, ekey)
+                        }
+                    />
+                </div>
+                <LoadingButton
                     variant="contained"
                     color="primary"
                     fullWidth
                     sx={{ mt: 3 }}
+                    loading={isLoading}
                     onClick={signup}
                 >
-                    Sign Up
-                </Button>
+                    <span>Sign Up</span>
+                </LoadingButton>
             </div>
         </Container>
     );

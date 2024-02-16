@@ -6,17 +6,18 @@ import {
     Typography,
     Box,
     Link,
+    ButtonBase
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 
 function VideoCard({ video }) {
     return (
-        <Link component={RouterLink} to={`/video/${video.id}`} underline="none">
-            <Card sx={{ maxWidth: 345 }}>
+        <ButtonBase sx={{ borderRadius: "4px" }} component={RouterLink} to={`/video/${video.id}`} underline="none">
+            <Card sx={{ width: 256 }}>
                 <CardMedia
                     component="img"
                     alt={video.title}
-                    height="140"
+                    height="144"
                     image={video.thumbnailUrl}
                 />
                 <CardContent>
@@ -28,7 +29,7 @@ function VideoCard({ video }) {
                     </Typography>
                 </CardContent>
             </Card>
-        </Link>
+        </ButtonBase>
     );
 }
 

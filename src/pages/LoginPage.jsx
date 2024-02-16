@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { useCookies } from "react-cookie";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
     Container,
     Typography,
     TextField,
-    Button,
     Snackbar,
+    Link
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
 export default function Login({ onLogin }) {
     const navigate = useNavigate();
@@ -17,6 +18,10 @@ export default function Login({ onLogin }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [openSnackbar, setOpenSnackbar] = useState(false);
+
+    if (cookies.token) {
+        navigate("/");
+    }
 
     const handleSnackbarClose = () => {
         setOpenSnackbar(false);
@@ -58,7 +63,7 @@ export default function Login({ onLogin }) {
                 })
                 .catch((error) => {
                     console.error("Request failed with error: " + error);
-                    setReqError({ message: "An error occurred." });
+                    setReqError({ message: error.message });
                     setOpenSnackbar(true);
                     setIsLoading(false);
                 });
@@ -82,13 +87,13 @@ export default function Login({ onLogin }) {
                 message={reqError && reqError.message}
             />
             <div
-                sx={{
+                style={{
                     boxShadow: 4,
                     p: 4,
                     bgcolor: "background.paper",
                     borderRadius: 1,
                     width: "100%",
-                    maxWidth: "xs",
+                    maxWidth: "500px",
                 }}
             >
                 <Typography variant="h4" sx={{ textAlign: "center", mb: 4 }}>
@@ -113,16 +118,27 @@ export default function Login({ onLogin }) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <Button
+                <LoadingButton
                     variant="contained"
                     color="primary"
                     fullWidth
                     sx={{ mt: 3 }}
                     onClick={login}
                     disabled={isLoading}
+                    loading={isLoading}
                 >
                     Login
-                </Button>
+                </LoadingButton>
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                    Don't have an account yet?{" "}
+                    <Link
+                        component={RouterLink}
+                        to="/signup"
+                        underline="none"
+                    >
+                        Sign up here
+                    </Link>
+                </Typography>
             </div>
         </Container>
     );

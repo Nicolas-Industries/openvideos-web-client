@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
     height: 100%;
     width: 100%;
     margin: 0;
@@ -7,4 +8,126 @@ html, body {
 
 a:-webkit-any-link {
     text-decoration: none;
+}
+
+.custom-slider {
+    position: relative;
+    transition: height 0.2s ease-in-out, margin 0.2s ease-in-out;
+    width: 98%;
+    height: 3px;
+    margin-bottom: 4px;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    cursor: pointer;
+}
+
+.custom-slider:hover {
+    height: 5px;
+    margin-bottom: 3px;
+}
+
+.slider-track {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #ccc;
+}
+
+.slider-fill {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 100%;
+    background: #3c82b4;
+}
+
+.slider-thumb {
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    background: #3c82b4;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    transition: opacity 0.2s;
+    opacity: 0;
+}
+
+.slider-track:hover .slider-thumb {
+    opacity: 1;
+}
+
+.video-player-controls {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 1) 15%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transition: opacity 0.2s;
+}
+
+.video-player {
+    position: relative;
+    background: black;
+}
+
+.video-player button {
+    position: relative;
+    cursor: pointer;
+    float: left;
+    width: 35px;
+    height: 35px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: white;
+    transition: transform 0.2s;
+}
+
+.video-player button:hover {
+    transform: scale(1.1);
+}
+
+.video-player-controls.hidden {
+    opacity: 0;
+}
+
+.custom-menu {
+    position: absolute;
+    right: 2px;
+    bottom: 45px;
+    background-color: rgba(43, 53, 65, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.custom-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.custom-menu ul li {
+    color: white;
+    font-size: 16px;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 200;
+}
+
+.custom-menu ul li:hover {
+    background-color: rgb(64, 86, 115);
 }

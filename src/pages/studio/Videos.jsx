@@ -8,15 +8,20 @@ import {
 } from "@mui/material";
 import VideoCard from "../../components/VideoCard";
 import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
 export default function StudioVideos() {
+    const navigate = useNavigate();
     const [cookies] = useCookies(["token"]);
     const [videos, setVideos] = useState(null);
     const [error, setError] = useState(null);
     const token = cookies.token;
 
+    if (!token) {
+        navigate("/");
+    }
+
     const fetchData = () => {
-        // Simulate fetching video data (you should replace this with actual API calls)
         fetch("https://api-openvideos.nicolastech.xyz/v1/user/getMyVideos", {
             method: "POST",
             headers: {
@@ -27,7 +32,7 @@ export default function StudioVideos() {
             }),
         })
             .then((response) => response.json())
-            .then((data) => setVideos(data))
+            .then((data) => setVideos(data.data))
             .catch((error) => {
                 console.log(error);
                 setError(error);
