@@ -8,7 +8,7 @@ OpenVideos is an open platform that allows you to share your videos with the wor
 
 ## How to use OpenVideos?
 
-Simply navigate to the [OpenVideos](https://openvideos.com/) website, once there you may sign up or immediately start watching videos.
+Simply navigate to the [OpenVideos](https://openvideos.nicolastech.xyz/) website, once there you may sign up or immediately start watching videos.
 
 ## Why should I use OpenVideos?
 
