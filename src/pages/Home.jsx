@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-    Container,
-    Typography,
-    Grid,
-    CircularProgress,
-} from "@mui/material";
+import { Container, Typography, Grid, CircularProgress } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import VideoCard from "../components/VideoCard";
 
@@ -12,18 +7,19 @@ export default function Home() {
     const [videos, setVideos] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [maxPage, setMaxPage] = useState(1);
     const [firstTimeFetch, setFirstTimeFetch] = useState(true);
     const targetRef = useRef(null);
     const fetchingRef = useRef(false);
     const pageRef = useRef(1);
+    const maxPage = useRef(1);
 
     const fetchVideos = (pageNumber) => {
         if (loading) {
             return;
         }
 
-        if (fetchingRef.current || pageNumber > maxPage) {
+        if (fetchingRef.current || pageNumber > maxPage.current) {
+            console.log("Already fetching or reached max page");
             return;
         }
 
@@ -49,7 +45,7 @@ export default function Home() {
                 setError(null);
                 setLoading(false);
                 if (data.maxPage) {
-                    setMaxPage(data.maxPage);
+                    maxPage.current = data.maxPage;
                 }
                 setVideos((prevVideos) => [...prevVideos, ...data.data]);
                 fetchingRef.current = false;
@@ -95,8 +91,10 @@ export default function Home() {
             }
         };
 
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+        document.addEventListener("scroll", handleScroll);
+
+        return () =>
+            document.removeEventListener("scroll", handleScroll);
     }, []);
 
     return (
@@ -138,7 +136,11 @@ export default function Home() {
                     >
                         Error: {error.message}
                     </Typography>
-                    <LoadingButton variant="contained" onClick={handleRetry} loading={loading}>
+                    <LoadingButton
+                        variant="contained"
+                        onClick={handleRetry}
+                        loading={loading}
+                    >
                         Retry
                     </LoadingButton>
                 </Container>
